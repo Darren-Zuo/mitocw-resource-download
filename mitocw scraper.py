@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup as Soup
 
 
 def download_pdfs(parent_dir, url, directory):
-    ii = 0;
+    ii = 0
     basis = 'https://ocw.mit.edu'
 
     # create the downloading path name
@@ -23,7 +23,7 @@ def download_pdfs(parent_dir, url, directory):
     content = soup.find('main', {'id': 'course-content-section'})
 
     for link in content.find_all('a'):
-        ii = ii + 1;
+        ii = ii + 1
         # td_text = link.parent.text.strip()
         #
         # title = re.sub(r'\s*\(.*?\)\s*', '', td_text)
@@ -65,7 +65,13 @@ def download_pdfs(parent_dir, url, directory):
         #
         # print(title)
 
-        href = soup1.find('a', {'class', 'download-file'}).get('href')
+
+        # In case the hyperlink fetched is not a pdf file, raise an exception and continue running.
+        try:
+            href = soup1.find('a', {'class', 'download-file'}).get('href')
+        except AttributeError:
+            print('PDF link not found for:', title)
+            continue
 
         # jumps to a site ends with .pdf (pdf浏览网页)
         pdf_url = basis + href
@@ -100,11 +106,12 @@ def download_pdfs(parent_dir, url, directory):
 
 
 # parent directory in which you intend to save the files
-p_dir = 'E:\\supplementary\\6.974 Fundamentals Of Photonics Quantum Electronics'
+p_dir = 'E:\\supplementary\\通信课程\\6.041 Probabilistic Systems Analysis And Applied Probability'
 # the root site of the mitocw course
-origin_url = "https://ocw.mit.edu/courses/6-974-fundamentals-of-photonics-quantum-electronics-spring-2006"
+origin_url = "https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010"
 # sections to download
-url_lists = ["/pages/lecture-notes/", "/pages/exams/"]
+url_lists = ["/pages/lecture-notes/"]
+# url_lists = ["/pages/recitations/", "/pages/tutorials/"]
 # /study-materials/ "/pages/exams/","/pages/study-materials/",
 for item in url_lists:
     url = origin_url + item
