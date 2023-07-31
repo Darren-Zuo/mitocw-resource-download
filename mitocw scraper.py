@@ -14,7 +14,6 @@ def download_pdfs(parent_dir, url, directory):
         os.mkdir(path)
 
     # go to the site where href links are included
-    # url = "https://ocw.mit.edu/courses/18-085-computational-science-and-engineering-i-fall-2008//pages/assignments/"
     r = requests.get(url=url)
     text = r.content.decode('utf-8')
     soup = Soup(text, 'html.parser')
@@ -24,9 +23,6 @@ def download_pdfs(parent_dir, url, directory):
 
     for link in content.find_all('a'):
         ii = ii + 1
-        # td_text = link.parent.text.strip()
-        #
-        # title = re.sub(r'\s*\(.*?\)\s*', '', td_text)
         td_text = link.text
         title = re.sub(r'\s*\(.*?\)\s*', '', td_text) # removing "(PDF)" from title
         title = str(ii) + " " + title
@@ -54,17 +50,6 @@ def download_pdfs(parent_dir, url, directory):
         r1 = requests.get(url=href)
         text1 = r1.content.decode('utf-8')
         soup1 = Soup(text1, 'html.parser')
-
-        # title = soup1.find('h2', {'class','pb-1 mb-1'}).text
-        # # define forbidden characters in naming a file
-        # forbidden_chars = ['<', '>', ':', '"', '/', '\\', '|', '?', '*']
-        #
-        # # ruling out these characters from the title
-        # for char in forbidden_chars:
-        #     title = title.replace(char, '')
-        #
-        # print(title)
-
 
         # In case the hyperlink fetched is not a pdf file, raise an exception and continue running.
         try:
