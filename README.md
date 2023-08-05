@@ -15,7 +15,7 @@ Luckily, MITOCW is not banned from the GFW, we should definitely take fully adva
 ## Getting Started
 
 Set 'p_dir' to be the directory in which you wish to store those files;
-And origin_url to be the root site of the course (remember to remove the last backslash from your url)
+And origin_url to be the root site of the course (remember to remove the last backslash from your url);
 'url_lists' should contain all the sections you wish to download.
 
 ### Prerequisites
