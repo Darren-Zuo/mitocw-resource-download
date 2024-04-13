@@ -92,7 +92,7 @@ def download_pdfs(parent_dir, url, directory):
 
 # parent directory in which you intend to save the files
 p_dir = 'E:\\supplementary\\通信课程\\6.041 Probabilistic Systems Analysis And Applied Probability'
-# the root site of the mitocw course
+# the root site of the mitocw course, no backslash at the root site
 origin_url = "https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010"
 # sections to download
 url_lists = ["/pages/lecture-notes/"]
