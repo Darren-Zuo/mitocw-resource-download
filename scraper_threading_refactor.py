@@ -4,22 +4,47 @@ import requests
 from bs4 import BeautifulSoup as Soup
 from concurrent.futures import ThreadPoolExecutor
 
-def download_pdf(title, pdf_url, path):
+def determine_url_file_type(file_url):
+    """
+    Determine the file type based on the URL.
+    """
+    file_extension = file_url.split('.')[-1]
+    if file_extension in ['pdf', 'zip', 'py']:
+        return file_extension
+    else:
+        return None
+
+def download_file(title, file_url, file_type, path):
+    """
+    Download the file from the given URL based on the specified file type.
+    """
     try:
-        pdf_response = requests.get(pdf_url)
-        pdf_response.raise_for_status()
-        filename = os.path.join(path, title + '.pdf')
-        with open(filename, 'wb') as f:
-            f.write(pdf_response.content)
+        response = requests.get(file_url)
+        response.raise_for_status()
 
-        if os.path.isfile(filename):
-            print(f"Download successful: {title}.pdf")
+        # Define filename based on file type
+        if file_type == 'pdf':
+            filename = os.path.join(path, title + '.pdf')
+        elif file_type == 'zip':
+            filename = os.path.join(path, title + '.zip')
+        elif file_type == 'py':
+            filename = os.path.join(path, title + '.py')
         else:
-            print(f"Download failed: {title}.pdf")
-    except requests.exceptions.RequestException as error:
-        print(f"An error occurred while downloading {title}.pdf: {error}")
+            print(f"Unsupported file type: {file_type}")
+            return
 
-def download_pdfs(parent_dir, url, directory):
+        # Write content to file
+        with open(filename, 'wb') as f:
+            f.write(response.content)
+
+        # Check if file was successfully downloaded
+        if os.path.isfile(filename):
+            print(f"Download successful: {title}.{file_type}")
+        else:
+            print(f"Download failed: {title}.{file_type}")
+    except requests.exceptions.RequestException as error:
+        print(f"An error occurred while downloading {title}.{file_type}: {error}")
+def download_files(parent_dir, url, directory):
     basis = 'https://ocw.mit.edu'
     path = os.path.join(parent_dir, directory)
 
@@ -60,30 +85,30 @@ def download_pdfs(parent_dir, url, directory):
             try:
                 href = soup1.find('a', {'class', 'download-file'}).get('href')
             except AttributeError:
-                print('PDF link not found for:', title)
+                print('Download link not found for:', title)
                 continue
 
-            pdf_url = basis + href
+            file_url = basis + href
 
-            if not pdf_url.endswith('.pdf'):
-                print('this url points to an anomalous file')
-                print(pdf_url)
-                continue
+            file_type = determine_url_file_type(file_url)
+            if file_type:
+                future = executor.submit(download_file, title, file_url, file_type, path)
+                futures.append(future)
+            else:
+                print("Unsupported file type.")
 
-            future = executor.submit(download_pdf, title, pdf_url, path)
-            futures.append(future)
 
         # Wait for all tasks to complete before proceeding.
         for future in futures:
             future.result()
 
 # parent directory in which you intend to save the files
-p_dir = 'E:\\supplementary\\14.01SC microeconomics'
+p_dir = 'e:\\supplementary\\6.0001 6.0002 Computation Python\\6.0002'
 # the root site of the mitocw course
-origin_url = "https://ocw.mit.edu/courses/14-01-principles-of-microeconomics-fall-2018"
+origin_url = "https://ocw.mit.edu/courses/6-0002-introduction-to-computational-thinking-and-data-science-fall-2016"
 # sections to download
-url_lists = ["/pages/lecture-notes/", "/pages/problem-sets/", "/pages/exams/"]
-# url_lists = ["/pages/recitations/", "/pages/tutorials/"]
+url_lists = ["/pages/assignments/", "/pages/lecture-slides-and-files/"]
+# url_lists = ["/pages/recitations/", "/pages/lecture-slides-code/"]
 # /study-materials/ "/pages/exams/","/pages/study-materials/",
 for item in url_lists:
     url = origin_url + item
@@ -91,4 +116,4 @@ for item in url_lists:
     print(url)
     dir = item.split("/")[2]
     print(dir)
-    download_pdfs(p_dir, url, dir)
+    download_files(p_dir, url, dir)
